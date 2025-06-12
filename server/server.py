@@ -1,18 +1,23 @@
 from dotenv import load_dotenv
-import os, httpx
-from typing import Any
+
+# import os, httpx
+# from typing import Any
 from mcp.server.fastmcp import FastMCP
-import asyncio
+
+# import asyncio
 import argparse
-from fastapi.routing import APIRoute
-import asyncio
-import uvicorn
+
+# from fastapi.routing import APIRoute
+# import asyncio
+# import uvicorn
 from mcp import ClientSession
 from mcp.client.sse import sse_client
-import asyncio
+
+# import asyncio
 
 from helper_functions.schematics import *
 from helper_functions.iam import *
+from helper_functions.powervs import *
 
 
 load_dotenv()
@@ -37,29 +42,27 @@ async def fetch_schematics_workspaces() -> str:
             return "Unable to fetch the workspaces"
         else:
             # print(workspaces)
-            context_str = format_result(workspaces)
+            context_str = sch_format_result(workspaces)
             print(context_str)
             return context_str
 
 
-# @mcp.tool()
-# async def get_grouped_schematics_workspaces(created_by: str = None, location: str = None) -> str:
-#     """Get a list of schematics workspaces in my IBM cloud account, optionally filtered by creator or location."""
-#     tokens = await get_api_access_token()
-#     if not tokens:
-#         return "Unable to fetch the access token."
+@mcp.tool()
+async def fetch_powervs_workspaces() -> str:
+    """Get a list of PowerVS or Power Virtual Server workspaces in my IBM cloud account."""
+    tokens = await get_api_access_token()
 
-#     workspaces = get_schematics_workspaces(tokens)
-#     if not workspaces:
-#         return "No workspaces found."
-
-#     # Filter
-#     if created_by:
-#         workspaces = [w for w in workspaces if w.get("created_by", "").lower() == created_by.lower()]
-#     if location:
-#         workspaces = [w for w in workspaces if location.lower() in w.get("location", "").lower()]
-
-#     return format_result(workspaces)
+    if not tokens:
+        return "Unable to fetch the access token."
+    else:
+        workspaces = get_power_workspaces(tokens)
+        if not workspaces:
+            return "Unable to fetch the workspaces"
+        else:
+            # print(workspaces)
+            context_str = pvs_format_result(workspaces)
+            print(context_str)
+            return context_str
 
 
 @mcp.resource("echo://{name}")
@@ -75,30 +78,6 @@ async def call_mcp_tool():
             await session.initialize()
             response = await session.call_tool(name="fetch_schematics_workspaces")
             print("Tool response:", response.content)
-
-
-# if __name__ == "__main__":
-#     # Start your MCP server in background
-#     import threading
-
-#     def start_server():
-#         app = mcp.sse_app()
-#         uvicorn.run(app, host="127.0.0.1", port=8000)
-
-#     server_thread = threading.Thread(target=start_server, daemon=True)
-#     server_thread.start()
-
-#     # Give server a second to start up (or better: wait until ready)
-#     import time
-
-#     time.sleep(2)
-
-#     # Now call your tool via asyncio event loop
-#     async def main():
-#         output = await call_mcp_tool()
-#         print("Tool output:\n", output)
-
-#     asyncio.run(main())
 
 
 if __name__ == "__main__":

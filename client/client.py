@@ -68,7 +68,12 @@ def router(state: State):
 # PowerVS agent node
 async def powervs_agent(state: State):
     last_message = state["messages"][-1]
-    powervs_context = state.get("powervs_context") or "No PowerVS context available."
+    print("PowerVS Agent called.")
+
+    try:
+        context = await call_mcp_tool(tool_name="fetch_powervs_workspaces")
+    except Exception as e:
+        context = f"Error fetching powervs workspaces: {str(e)}"
 
     messages = [
         {
@@ -76,7 +81,7 @@ async def powervs_agent(state: State):
             "content": f"""
             You are an AI assistant answering questions about PowerVS Workspaces in IBM Cloud.
             Use the following context:
-            {powervs_context}
+            {context}
             """,
         },
         {"role": "user", "content": last_message.content},

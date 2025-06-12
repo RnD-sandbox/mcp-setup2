@@ -28,14 +28,14 @@ def get_schematics_workspaces(tokens: dict) -> dict[str, Any] | None:
         raise Exception(f"Failed to fetch workspace: {response.status_code} - {response.text}")
 
 
-def format_result(workspaces: dict) -> str:
+def sch_format_result(workspaces: dict) -> str:
     """Format the schematics workspaces response into a readable string"""
 
     output = []
     for i, workspace in enumerate(workspaces, start=1):
         output.append(f"Workspace {i}:")
-        output.append(f"- ID: {workspace.get('id')}")
         output.append(f"- Name: {workspace.get('name')}")
+        output.append(f"- ID: {workspace.get('id')}")
         output.append(f"- Resource Group: {workspace.get('resource_group')}")
         output.append(f"- Location: {workspace.get('location')}")
         output.append(f"- Status: {workspace.get('status')}")
