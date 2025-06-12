@@ -1,0 +1,5 @@
+*.env
+**/.venv/*
+settings.json
+*uv.lock
+**/__pycache__/*
